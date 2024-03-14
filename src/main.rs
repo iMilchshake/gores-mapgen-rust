@@ -98,7 +98,7 @@ async fn main() {
         }
 
         editor.define_egui(&walker);
-        editor.set_cam(&map);
+        editor.set_cam(editor.get_display_factor(&map));
         editor.handle_user_inputs(&map);
 
         clear_background(WHITE);

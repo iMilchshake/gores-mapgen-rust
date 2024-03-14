@@ -212,7 +212,7 @@ async fn main() {
         fps_ctrl.on_frame_start();
         editor.on_frame_start();
         define_egui(&mut editor, &mut state, &kernel_table);
-        editor.set_cam(&map);
+        editor.set_cam();
         editor.handle_user_inputs(&map);
         clear_background(GRAY);
         draw_walker(&walker);

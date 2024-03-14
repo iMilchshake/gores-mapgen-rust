@@ -1,6 +1,7 @@
 use std::time::Instant;
 
 use crate::{CuteWalker, Map};
+use egui::Pos2;
 use egui::{epaint::Shadow, Color32, Frame, Label, Margin};
 use macroquad::camera::{set_camera, Camera2D};
 use macroquad::input::{
@@ -100,7 +101,6 @@ impl Editor {
         egui_macroquad::ui(|egui_ctx| {
             egui::SidePanel::right("right_panel").show(egui_ctx, |ui| {
                 ui.label("hello world");
-
                 // toggle pause
                 if ui.button("toggle").clicked() {
                     self.playback.toggle();
@@ -151,18 +151,15 @@ impl Editor {
         )));
     }
 
-    pub fn set_cam(&mut self, map: &Map) {
-        let display_factor = self.get_display_factor(map);
-        let x_view = display_factor * map.width as f32;
-        let y_view = display_factor * map.height as f32;
-        let y_shift = screen_height() - y_view;
-        let map_rect = Rect::new(0.0, 0.0, map.width as f32, map.height as f32);
-        let mut cam = Camera2D::from_display_rect(map_rect);
+    pub fn set_cam(&mut self, display_factor: f32) {
+        let canvas_width = self.canvas.unwrap().width();
+        let canvas_height = self.canvas.unwrap().height();    
 
-        // so i guess this is (x, y, width, height) not two positions?
-        cam.viewport = Some((0, y_shift as i32, x_view as i32, y_view as i32));
+        let mut cam = Camera2D::from_display_rect(Rect::new(0.0, 0.0, canvas_width, canvas_height));
+        cam.viewport = Some((0, 0, canvas_width as i32, canvas_height as i32));
 
-        cam.target -= self.offset;
+        let zoomed_offset = self.offset * cam.zoom;
+        cam.target = -self.offset * display_factor - zoomed_offset / (self.zoom);
         cam.zoom *= self.zoom;
 
         set_camera(&cam);
